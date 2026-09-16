@@ -1,0 +1,528 @@
+<!doctype html>
+<title>Универсальный IT-исполнитель</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg: #f4f5f2;
+    --surface: #ffffff;
+    --surface-2: #eceeea;
+    --ink: #1a1f1b;
+    --ink-muted: #5c665f;
+    --ink-faint: #8b948c;
+    --border: #dde1da;
+    --accent: #146c4c;
+    --accent-ink: #0f5039;
+    --accent-soft: #e3f1e9;
+    --tag-bg: #eef1ec;
+    --shadow: 0 1px 2px rgba(20, 30, 24, 0.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #12140f;
+      --surface: #1a1d17;
+      --surface-2: #21251d;
+      --ink: #e8ebe4;
+      --ink-muted: #9ba496;
+      --ink-faint: #6d766a;
+      --border: #2b3026;
+      --accent: #3ecb92;
+      --accent-ink: #7fe0b3;
+      --accent-soft: rgba(62, 203, 146, 0.12);
+      --tag-bg: #202419;
+      --shadow: none;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #12140f;
+    --surface: #1a1d17;
+    --surface-2: #21251d;
+    --ink: #e8ebe4;
+    --ink-muted: #9ba496;
+    --ink-faint: #6d766a;
+    --border: #2b3026;
+    --accent: #3ecb92;
+    --accent-ink: #7fe0b3;
+    --accent-soft: rgba(62, 203, 146, 0.12);
+    --tag-bg: #202419;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding-inline: 16px;
+    padding-block: 48px 64px;
+  }
+
+  .sheet {
+    max-width: 740px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 44px clamp(20px, 5vw, 56px) 52px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  /* header */
+  header.card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 26px;
+  }
+
+  .name-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 20px;
+  }
+
+  h1 {
+    margin: 2px 0 0;
+    font-size: clamp(26px, 4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .role-target {
+    margin: 4px 0 0;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 13px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  .chip.accent {
+    background: var(--accent-soft);
+    border-color: transparent;
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+
+  .contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .contact-row a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--border); }
+  .contact-row a:hover { border-color: var(--accent); }
+
+  /* summary */
+  .summary {
+    font-size: 15.5px;
+    color: var(--ink);
+    max-width: 62ch;
+    margin: 0 0 30px;
+  }
+
+  section { margin-bottom: 30px; }
+  section > .eyebrow { display: block; margin-bottom: 12px; }
+
+  /* services */
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 520px) {
+    .service-grid { grid-template-columns: 1fr; }
+  }
+  .service-card {
+    padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .service-card h3 {
+    margin: 0 0 4px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .service-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.45;
+  }
+
+  .cta-line {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--accent-soft);
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: var(--accent-ink);
+  }
+
+  /* skills */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 10px 18px;
+  }
+  @media (max-width: 480px) {
+    .skill-grid { grid-template-columns: 1fr; gap: 4px; }
+    .skill-cat { margin-top: 8px; }
+  }
+  .skill-cat {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    padding-top: 3px;
+  }
+  .skill-vals { font-size: 14px; color: var(--ink); }
+  .skill-vals .dot { color: var(--ink-faint); padding: 0 5px; }
+
+  /* experience */
+  .job {
+    padding: 18px 0;
+    border-top: 1px solid var(--border);
+  }
+  .job:first-of-type { border-top: none; padding-top: 0; }
+
+  .job-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-bottom: 3px;
+  }
+
+  .job-title { font-weight: 600; font-size: 16px; }
+  .job-company { color: var(--accent-ink); font-weight: 500; }
+
+  .job-dates {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .job-context {
+    font-size: 13.5px;
+    color: var(--ink-muted);
+    margin: 2px 0 10px;
+  }
+
+  ul.achievements {
+    margin: 0 0 10px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  ul.achievements li { font-size: 14.5px; }
+  ul.achievements li::marker { color: var(--accent); }
+  ul.achievements strong { font-weight: 600; }
+
+  .tech-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tech-tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  footer.note {
+    margin-top: 8px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--border);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+
+  .print-btn {
+    position: fixed;
+    top: calc(18px + env(safe-area-inset-top, 0px));
+    right: 18px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .print-btn:focus-visible, a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media print {
+    .print-btn { display: none; }
+    body { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; border: none; border-radius: 0; max-width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sheet { animation: rise 0.35s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<button class="print-btn" onclick="window.print()" type="button">⎙ Печать / PDF</button>
+
+<div class="sheet">
+
+  <header class="card">
+    <div class="name-row">
+      <div>
+        <span class="eyebrow">Профиль исполнителя</span>
+        <h1>Егор [Фамилия]</h1>
+        <p class="role-target">Универсальный IT-исполнитель — сайты, боты, мобильные приложения, DevOps, серверы</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <span class="chip accent">Беру проекты любого размера</span>
+      <span class="chip">12 лет в разработке</span>
+      <span class="chip">Удалённо · по договору</span>
+      <span class="chip">Отклик в течение дня</span>
+    </div>
+    <div class="contact-row">
+      <a href="tel:+79283468468">+7 928 346-84-68</a>
+      <a href="mailto:sha.egor@gmail.com">sha.egor@gmail.com</a>
+    </div>
+  </header>
+
+  <p class="summary">
+    12 лет в разработке — от отдельных фич до архитектуры систем с нагрузкой 10 000+ RPS. Закрываю задачи «под ключ» в одиночку: сайт, бот, мобильное приложение, сервер, интеграция — без передачи между разными подрядчиками. Работал в связке с командами от 2 до 25+ человек, поэтому одинаково спокойно беру и часовую правку, и проект на несколько месяцев.
+  </p>
+  <div class="cta-line">
+    Открыт к небольшим и тестовым проектам — приоритет коротким срокам и честной цене ради первых отзывов на старте.
+  </div>
+
+  <section>
+    <span class="eyebrow">Что делаю</span>
+    <div class="service-grid">
+      <div class="service-card">
+        <h3>Сайты и интернет-магазины</h3>
+        <p>Лендинги, корпоративные сайты, e-commerce — от вёрстки до бэкенда под ключ.</p>
+      </div>
+      <div class="service-card">
+        <h3>Боты и автоматизация</h3>
+        <p>Telegram-боты, интеграции сервисов, скрипты для рутинных задач бизнеса.</p>
+      </div>
+      <div class="service-card">
+        <h3>Мобильные приложения</h3>
+        <p>Кроссплатформенно на Flutter или нативно на Kotlin/Swift, интеграция с backend.</p>
+      </div>
+      <div class="service-card">
+        <h3>Backend и API</h3>
+        <p>REST/GraphQL API, аутентификация, платёжные интеграции, работа с базами данных.</p>
+      </div>
+      <div class="service-card">
+        <h3>Серверы и DevOps</h3>
+        <p>Docker, Kubernetes, CI/CD, мониторинг — настрою и передам с документацией.</p>
+      </div>
+      <div class="service-card">
+        <h3>Аудит и ускорение</h3>
+        <p>Найду узкие места в существующем проекте: производительность, база данных, код.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Навыки</span>
+    <div class="skill-grid">
+      <div class="skill-cat">Управление</div>
+      <div class="skill-vals">CTO / архитектура<span class="dot">·</span>Микросервисы<span class="dot">·</span>Agile / Scrum<span class="dot">·</span>KPI / OKR<span class="dot">·</span>Найм и менторство<span class="dot">·</span>Бюджетирование</div>
+
+      <div class="skill-cat">Backend</div>
+      <div class="skill-vals">PHP<span class="dot">·</span>Python<span class="dot">·</span>Go<span class="dot">·</span>Java<span class="dot">·</span>Node.js</div>
+
+      <div class="skill-cat">Frontend / Mobile</div>
+      <div class="skill-vals">Vue.js<span class="dot">·</span>Flutter / Dart<span class="dot">·</span>Kotlin<span class="dot">·</span>Swift</div>
+
+      <div class="skill-cat">Данные</div>
+      <div class="skill-vals">PostgreSQL<span class="dot">·</span>ClickHouse<span class="dot">·</span>MySQL<span class="dot">·</span>Redis<span class="dot">·</span>MongoDB<span class="dot">·</span>RabbitMQ</div>
+
+      <div class="skill-cat">Инфраструктура</div>
+      <div class="skill-vals">Docker<span class="dot">·</span>Kubernetes<span class="dot">·</span>Nginx<span class="dot">·</span>GitLab CI/CD<span class="dot">·</span>Terraform</div>
+
+      <div class="skill-cat">Мониторинг / Security</div>
+      <div class="skill-vals">Prometheus / Grafana / Loki<span class="dot">·</span>Keycloak / 2FA<span class="dot">·</span>Пентест<span class="dot">·</span>PCI DSS</div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Опыт работы</span>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Директор департамента разработки</span> · <span class="job-company">ООО «Спорттех»</span></div>
+        <div class="job-dates">02.2026 — н.в. · 8 мес</div>
+      </div>
+      <p class="job-context">ПО для управления спортивными мероприятиями (rustiming.com), пиковые нагрузки 10 000+ RPS, команда 25+ разработчиков.</p>
+      <ul class="achievements">
+        <li>Обеспечил бесперебойную работу 5 ключевых систем во время международных турниров («Игры будущего», GOTF, Contenders) при трафике, втрое превышающем средний.</li>
+        <li>Сократил время отклика критических API на <strong>40%</strong> (Redis-кэш, асинхронные драйверы БД); снизил число критических инцидентов на <strong>60%</strong> (Prometheus/Loki, регулярный пентест).</li>
+        <li>Перевёл 5 модулей с монолита на микросервисы; запустил кроссплатформенное приложение на Flutter — вовлечённость пользователей <strong>+25%</strong>.</li>
+        <li>Автоматизировал CI/CD, сократив Lead Time на <strong>25%</strong>; внедрил KPI/OKR для 25+ сотрудников — удержание ключевых разработчиков <strong>+30%</strong>.</li>
+        <li>Оптимизировал расходы на Kubernetes-инфраструктуру на <strong>20%</strong> без потери производительности.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">Flutter</span><span class="tech-tag">Kotlin</span><span class="tech-tag">Swift</span><span class="tech-tag">Kubernetes</span><span class="tech-tag">ClickHouse</span><span class="tech-tag">PostgreSQL</span><span class="tech-tag">Redis</span><span class="tech-tag">Keycloak</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Технический директор</span> · <span class="job-company">Биэнджи Солюшенс</span></div>
+        <div class="job-dates">04.2025 — 12.2025 · 9 мес</div>
+      </div>
+      <ul class="achievements">
+        <li>Собрал команду разработки с нуля, выстроил Scrum-процессы (спринты по 2 недели) — предсказуемость релизов <strong>+40%</strong>.</li>
+        <li>Внедрил CI/CD и обязательный код-ревью — дефекты в продакшене <strong>−50%</strong> за первые 3 месяца.</li>
+        <li>Запустил декомпозицию монолита на микросервисы (Go, Python) — время развёртывания фичей сократилось с 2 дней до 4 часов.</li>
+        <li>Выпустил нативное Android-приложение (Kotlin): авторизация, push-уведомления, офлайн-режим.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">Go</span><span class="tech-tag">Python</span><span class="tech-tag">Vue.js</span><span class="tech-tag">Kotlin</span><span class="tech-tag">Kubernetes</span><span class="tech-tag">PostgreSQL</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Руководитель разработки</span> · <span class="job-company">Olhar.media</span></div>
+        <div class="job-dates">03.2024 — 03.2025 · 1 г. 1 мес</div>
+      </div>
+      <p class="job-context">ERP-платформа геотаргетированной рекламы, 10k+ подключений в реальном времени, команда 15 человек.</p>
+      <ul class="achievements">
+        <li>Спроектировал микросервисную архитектуру (геообработка, аналитика, платежи) с uptime <strong>99.9%</strong>.</li>
+        <li>Ускорил вывод новых функций на <strong>35%</strong>, руководя кросс-функциональной командой.</li>
+        <li>Внедрил нагрузочное тестирование и мониторинг (Prometheus/Grafana) — инциденты <strong>−45%</strong>.</li>
+        <li>Оптимизировал запросы к PostGIS — генерация отчётов сократилась с 5 минут до 30 секунд.</li>
+        <li>Запустил Flutter-приложение для отслеживания кампаний в реальном времени — удержание клиентов <strong>+20%</strong>.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">PHP / Laravel</span><span class="tech-tag">Vue 3</span><span class="tech-tag">PostgreSQL / PostGIS</span><span class="tech-tag">Redis</span><span class="tech-tag">Flutter</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Технический директор (CTO)</span> · <span class="job-company">Greenway Global</span></div>
+        <div class="job-dates">01.2023 — 01.2024 · 1 г. 1 мес</div>
+      </div>
+      <p class="job-context">Международная сеть, две команды по 8–10 разработчиков.</p>
+      <ul class="achievements">
+        <li>Реорганизовал процессы двух команд на Agile (Scrum/Kanban) — предсказуемость сроков <strong>+30%</strong>.</li>
+        <li>Провёл миграцию данных 5000+ клиентов из 1С в веб-систему (Django, Vue.js) с нулевым простоем.</li>
+        <li>Внедрил unit- и интеграционные тесты, покрыв 75% критического кода — баги в релизах <strong>−40%</strong>.</li>
+        <li>Запустил Flutter-приложение для партнёров сети — активность партнёров <strong>+15%</strong>.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">Python / Django / FastAPI</span><span class="tech-tag">Vue.js</span><span class="tech-tag">PostgreSQL</span><span class="tech-tag">Flutter</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Fullstack-разработчик</span> · <span class="job-company">Devar</span></div>
+        <div class="job-dates">05.2021 — 11.2022 · 1 г. 7 мес</div>
+      </div>
+      <p class="job-context">Образовательная платформа с элементами дополненной реальности.</p>
+      <ul class="achievements">
+        <li>Реализовал полный цикл разработки: REST API на Laravel с JWT-аутентификацией, админ-панель, личный кабинет.</li>
+        <li>Собрал адаптивную мобильную версию на Vue.js с ленивой загрузкой.</li>
+        <li>Интегрировал блочный язык Scratch с Three.js для интерактивных AR-проектов.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">PHP / Laravel</span><span class="tech-tag">Vue.js</span><span class="tech-tag">Three.js</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-head">
+        <div><span class="job-title">Ведущий разработчик / Архитектор</span> · <span class="job-company">ООО «Успех»</span></div>
+        <div class="job-dates">03.2014 — 12.2020 · 6 л. 10 мес</div>
+      </div>
+      <ul class="achievements">
+        <li>Спроектировал модульную архитектуру для тиражирования сайта на новые филиалы сети на общем ядре.</li>
+        <li>Разработал систему бронирования с интеграцией календарей (Google/Outlook), платёжный модуль (эквайринг Сбербанка, PCI DSS), уведомления и купоны.</li>
+        <li>Внедрил адаптивный мультиязычный фронтенд (Vue.js), SEO-микроразметку (Schema.org) и аналитику.</li>
+      </ul>
+      <div class="tech-line">
+        <span class="tech-tag">Vue.js</span><span class="tech-tag">PostgreSQL</span><span class="tech-tag">MongoDB</span><span class="tech-tag">PCI DSS</span>
+      </div>
+    </div>
+
+  </section>
+
+  <footer class="note">
+    Профиль собран для фриланс-площадок: широкий охват задач на старте, узкая корпоративная версия — по запросу.
+  </footer>
+
+</div>
